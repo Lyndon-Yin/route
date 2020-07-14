@@ -1,0 +1,26 @@
+{
+  "name": "lyndon/route",
+  "description": "基于Laravel的通用路由解析包",
+  "keywords": ["laravel", "route"],
+  "require": {
+    "illuminate/http": "~5.0|~6.0|~7.0",
+    "illuminate/support": "~5.0|~6.0|~7.0"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Lyndon Yin",
+      "email": "2353171512@qq.com",
+      "role": "Developer"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Lyndon\\Route\\": "src/Lyndon/Route/"
+    }
+  },
+  "config": {
+    "preferred-install": "dist"
+  }
+}
