@@ -18,7 +18,7 @@
   "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
-      "Lyndon\\Route\\": "src/Lyndon/Route/"
+      "Lyndon\\Route\\": ""
     }
   },
   "config": {
