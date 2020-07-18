@@ -126,4 +126,14 @@ abstract class AbstractAction
      * @return string
      */
     public abstract function allowMethod();
+
+    /**
+     * 当前Action允许的请求方式列表
+     *
+     * @return array
+     */
+    public function allowMethods()
+    {
+        return [];
+    }
 }

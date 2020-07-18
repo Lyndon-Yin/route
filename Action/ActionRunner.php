@@ -39,14 +39,71 @@ class ActionRunner
             ));
         }
 
-        $method = strtoupper($request->method());
-        if (! in_array($method, $instance->getMethods())) {
-            throw new RouteException(self::TAG, sprintf(
-                'Request\'s method "%s" be not supported, action "%s"\'s supported methods "%s"',
-                $method, $instance->getName(), implode(',', $instance->getMethods())
+        $method = $request->method();
+        $supportMethods = static::supportMethods($instance);
+        if (! in_array(strtoupper($method), $supportMethods)) {
+            throw new RouteException(sprintf(
+                self::TAG . ' run(), Request\'s method "%s" be not supported, action "%s"\'s supported methods "%s"',
+                $method, $instance->getName(), implode(',', $supportMethods)
             ));
         }
 
         return $instance->onRun($request);
+    }
+
+    /**
+     * Action类支持的请求方式列表
+     *
+     * @param AbstractAction $instance
+     * @return array
+     * @throws RouteException
+     */
+    protected static function supportMethods(AbstractAction $instance)
+    {
+        $allowMethods = $instance->allowMethods();
+        if (is_array($allowMethods)) {
+            foreach ($allowMethods as &$method) {
+                // $method留待异常错误返回
+                $upperMethod = strtoupper($method);
+
+                // 验证允许的请求方式是否合法
+                if (! in_array($upperMethod, $instance->getMethods())) {
+                    throw new RouteException(sprintf(
+                        self::TAG . ' supportMethods(), Method "%s" in allowMethods be not supported, action "%s"\'s supported methods "%s"',
+                        $method, $instance->getName(), implode(',', $instance->getMethods())
+                    ));
+                }
+
+                $method = $upperMethod;
+            }
+            unset($method);
+        } else {
+            throw new RouteException(sprintf(
+                self::TAG . ' supportMethods(), Method allowMethods in Action "%s" must return array',
+                $instance->getName()
+            ));
+        }
+
+        $method = $instance->allowMethod();
+        $upperMethod = strtoupper($method);
+        if (! in_array($upperMethod, $instance->getMethods())) {
+            throw new RouteException(sprintf(
+                self::TAG . ' supportMethods(), Method "%s" return from allowMethod be not supported, action "%s"\'s supported methods "%s"',
+                $method, $instance->getName(), implode(',', $instance->getMethods())
+            ));
+        }
+
+        if (! in_array($upperMethod, $allowMethods)) {
+            $allowMethods[] = $upperMethod;
+        }
+
+        if (empty($allowMethods)) {
+            throw new RouteException(sprintf(
+                self::TAG . ' supportMethods(), Action "%s" has no allowed method',
+                $instance->getName())
+            );
+        }
+
+        return $allowMethods;
     }
 }
