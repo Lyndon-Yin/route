@@ -48,7 +48,9 @@ class ActionRunner
             ));
         }
 
-        return $instance->onRun($request);
+        $instance->preReturn = $instance->preRun($request);
+        $instance->onReturn  = $instance->onRun($request);
+        return $instance->postRun($request);
     }
 
     /**

@@ -77,6 +77,20 @@ abstract class AbstractAction
     private $name = '';
 
     /**
+     * 前置方法返回结果
+     *
+     * @var null|mixed
+     */
+    public $preReturn = null;
+
+    /**
+     * 主方法返回结果
+     *
+     * @var null|mixed
+     */
+    public $onReturn = null;
+
+    /**
      * AbstractAction constructor.
      */
     public function __construct()
@@ -95,10 +109,36 @@ abstract class AbstractAction
     }
 
     /**
+     * onRun()前置操作方法
+     *
+     * @param Request $request
+     */
+    public function preRun(Request $request)
+    {
+
+    }
+
+    /**
+     * 主方法
+     * 可以通过$this->preReturn获取preRun()的返回结果
+     *
      * @param Request $request
      * @return mixed
      */
     public abstract function onRun(Request $request);
+
+    /**
+     * onRun()后置操作方法
+     * 可以通过$this->onReturn和$this->preReturn获取前两个方法的返回结果
+     * 不重写该方法，整个action将返回onRun()返回的结果，若重写，则返回当前方法的结果
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function postRun(Request $request)
+    {
+        return $this->onReturn;
+    }
 
     /**
      * 所有的请求方式
