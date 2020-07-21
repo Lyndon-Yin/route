@@ -43,7 +43,7 @@ class ActionRunner
         $supportMethods = static::supportMethods($instance);
         if (! in_array(strtoupper($method), $supportMethods)) {
             throw new RouteException(sprintf(
-                self::TAG . ' run(), Request\'s method "%s" be not supported, action "%s"\'s supported methods "%s"',
+                self::TAG . ' run(), Request\'s method "%s" be not supported, action "%s" is supported methods "%s"',
                 $method, $instance->getName(), implode(',', $supportMethods)
             ));
         }
@@ -71,7 +71,7 @@ class ActionRunner
                 // 验证允许的请求方式是否合法
                 if (! in_array($upperMethod, $instance->getMethods())) {
                     throw new RouteException(sprintf(
-                        self::TAG . ' supportMethods(), Method "%s" in allowMethods be not supported, action "%s"\'s supported methods "%s"',
+                        'Method "%s" in allowMethods be not supported, action "%s" is supported methods "%s"',
                         $method, $instance->getName(), implode(',', $instance->getMethods())
                     ));
                 }
@@ -81,7 +81,7 @@ class ActionRunner
             unset($method);
         } else {
             throw new RouteException(sprintf(
-                self::TAG . ' supportMethods(), Method allowMethods in Action "%s" must return array',
+                'Method allowMethods() in Action "%s" must return array',
                 $instance->getName()
             ));
         }
@@ -90,7 +90,7 @@ class ActionRunner
         $upperMethod = strtoupper($method);
         if (! in_array($upperMethod, $instance->getMethods())) {
             throw new RouteException(sprintf(
-                self::TAG . ' supportMethods(), Method "%s" return from allowMethod be not supported, action "%s"\'s supported methods "%s"',
+                'Method "%s" return from allowMethod be not supported, action "%s" is supported methods "%s"',
                 $method, $instance->getName(), implode(',', $instance->getMethods())
             ));
         }

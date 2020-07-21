@@ -41,13 +41,20 @@ class Path4Router
 
             return ActionRunner::run($actionName, $request);
         } catch (\Exception $e) {
-            return sprintf(
-                "%s in %s file at %s line\r%s",
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine(),
-                $e->getTraceAsString()
-            );
+            $appEnv = strtolower(env('APP_ENV', 'dev'));
+            if (in_array($appEnv, ['dev', 'test'])) {
+                // dev和test环境，返回相信错误信息
+                return sprintf(
+                    "%s in %s file at %s line\r%s",
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine(),
+                    $e->getTraceAsString()
+                );
+            } else {
+                // beta，pro环境仅返回错误提示，不返回详细信息
+                return $e->getMessage();
+            }
         }
     }
 
