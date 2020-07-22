@@ -1,6 +1,7 @@
 <?php
 namespace Lyndon\Route\Action;
 
+use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Lyndon\Route\Exceptions\RouteException;
 
@@ -18,18 +19,26 @@ class Path4Router
     const SEGMENTS_NUM = 4;
 
     /**
-     * Actions目录
+     * @var string Action目录
      */
-    const ACTIONS_DIRECTORY = 'App\\Http\\Controllers';
+    public static $actionDir = 'App\\Http\\Controllers';
 
     /**
      * 分析路由，并执行Action
      *
      * @param Request $request
      * @return array|string
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public static function route(Request $request)
     {
+        $actionDir = Container::getInstance()
+            ->make('config')
+            ->get('LyndonRoute.actionDir', null);
+        if (! is_null($actionDir)) {
+            self::$actionDir = $actionDir;
+        }
+
         try {
             $segments = self::analyzeUri($request->segments());
             $action     = array_pop($segments);
@@ -86,7 +95,7 @@ class Path4Router
             throw new RouteException(self::TAG . ' actionName(), unable to find the requested action empty.');
         }
 
-        return self::ACTIONS_DIRECTORY . '\\' . $appType . '\\' . $module . '\\' . $controller . '\\' . $action;
+        return self::$actionDir . '\\' . $appType . '\\' . $module . '\\' . $controller . '\\' . $action;
     }
 
     /**
