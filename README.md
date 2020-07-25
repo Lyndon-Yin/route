@@ -20,6 +20,27 @@ Route::group([
 });
 ```
 
+注意：  
+App\Providers\RouteServiceProvider文件中，对于api和web有各自的路由支持，分别是mapWebRoutes()和mapApiRoutes()方法。
+这两个方法中的prefix()中的'web'和'api'，或者其他自定义的前缀prefix，是上述静态方法的第二个参数。
+
+例如，若在routes/api.php文件中，且mapApiRoutes()中有prefix('api')，则：
+```php
+use Illuminate\Http\Request;
+
+Route::group([
+    'prefix' => "admin",
+    'middleware' => [
+        // 中间件列表
+    ]
+], function ($router) {
+    $router->any('{slug?}', function (Request $request) {
+        return \Lyndon\Route\Action\Path4Router::route($request, 'api');
+    })->where('slug', '(.*)?');
+});
+```
+此时的url地址形如：http://127.0.0.1/api/admin/module/controller/action
+
 然后在app/Http/Controllers中添加如下目录结构：
 ```
 AppType1

@@ -27,20 +27,27 @@ class Path4Router
      * 分析路由，并执行Action
      *
      * @param Request $request
+     * @param string $prefix
      * @return array|string
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public static function route(Request $request)
+    public static function route(Request $request, $prefix = '')
     {
-        $actionDir = Container::getInstance()
-            ->make('config')
-            ->get('LyndonRoute.actionDir', null);
-        if (! is_null($actionDir)) {
-            self::$actionDir = $actionDir;
-        }
-
         try {
-            $segments = self::analyzeUri($request->segments());
+            self::init();
+
+            // 去除url前缀，并验证前缀的合法性
+            $segments = $request->segments();
+            if (! empty($prefix)) {
+                $urlPrefix = array_shift($segments);
+                if ($urlPrefix !== $prefix) {
+                    throw new RouteException(sprintf(
+                        self::TAG . ' route(), the requested prefix "%s" wrong, must be "%s".',
+                        $urlPrefix, $prefix
+                    ));
+                }
+            }
+
+            $segments = self::analyzeUri($segments);
             $action     = array_pop($segments);
             $controller = array_pop($segments);
             $module     = array_pop($segments);
@@ -52,7 +59,7 @@ class Path4Router
         } catch (\Exception $e) {
             $appEnv = strtolower(env('APP_ENV', 'dev'));
             if (in_array($appEnv, ['dev', 'test'])) {
-                // dev和test环境，返回相信错误信息
+                // dev和test环境，返回详细错误信息
                 return sprintf(
                     "%s in %s file at %s line\r%s",
                     $e->getMessage(),
@@ -64,6 +71,21 @@ class Path4Router
                 // beta，pro环境仅返回错误提示，不返回详细信息
                 return $e->getMessage();
             }
+        }
+    }
+
+    /**
+     * 路由地址初始化
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public static function init()
+    {
+        // 根目录初始化
+        $actionDir = Container::getInstance()->make('config')
+            ->get('LyndonRoute.actionDir', null);
+        if (! is_null($actionDir)) {
+            self::$actionDir = $actionDir;
         }
     }
 
