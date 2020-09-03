@@ -33,8 +33,6 @@ class Path4Router
     public static function route(Request $request, $prefix = '')
     {
         try {
-            self::init();
-
             // 去除url前缀，并验证前缀的合法性
             $segments = $request->segments();
             if (! empty($prefix)) {
@@ -46,6 +44,9 @@ class Path4Router
                     ));
                 }
             }
+
+            // 初始化http路由访问根目录
+            self::initActionDir();
 
             $segments = self::analyzeUri($segments);
             $action     = array_pop($segments);
@@ -79,10 +80,11 @@ class Path4Router
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public static function init()
+    protected static function initActionDir()
     {
         // 根目录初始化
-        $actionDir = Container::getInstance()->make('config')
+        $actionDir = Container::getInstance()
+            ->make('config')
             ->get('LyndonRoute.actionDir', null);
         if (! is_null($actionDir)) {
             self::$actionDir = $actionDir;
@@ -99,7 +101,7 @@ class Path4Router
      * @return string
      * @throws RouteException
      */
-    public static function actionName($appType, $module, $controller, $action)
+    protected static function actionName($appType, $module, $controller, $action)
     {
         if (($appType = trim($appType)) === '') {
             throw new RouteException(self::TAG . ' actionName(), unable to find the requested appType empty.');
@@ -127,7 +129,7 @@ class Path4Router
      * @return array
      * @throws RouteException
      */
-    public static function analyzeUri($segments)
+    protected static function analyzeUri($segments)
     {
         if (! is_array($segments)) {
             throw new RouteException(self::TAG . ' analyzeUri(), the requested segments not array.');
